@@ -1,0 +1,8 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>tppe</groupId>
+  <artifactId>trabalho1-tppe</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>rabalho 1 - Campeonato Brasileiro</name>
+  <description>Projeto para o trabalho 1 da disciplina de TPPE</description>
+</project>
