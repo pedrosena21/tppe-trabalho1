@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.campeonato.Time;
 
 
-class timeTest {
+class TimeTest {
     private Time timeTest;
 
     @BeforeEach
@@ -49,5 +49,20 @@ class timeTest {
         assertEquals(0, timeTest.getGolsMarcados());
         assertEquals(1, timeTest.getGolsSofridos());
         assertEquals(-1, timeTest.getSaldoGols());
+    }
+    
+    @Test
+    void variosJogos() {
+    	timeTest.atualizarEstatisticas(2, 0, 1, 0);        
+        timeTest.atualizarEstatisticas(1, 2, 0, 1); 
+        timeTest.atualizarEstatisticas(0, 0, 0, 0);
+        assertEquals(4, timeTest.getPontos());
+        assertEquals(1, timeTest.getVitorias());
+        assertEquals(1, timeTest.getEmpates());
+        assertEquals(1, timeTest.getDerrotas());
+        assertEquals(3, timeTest.getGolsMarcados());
+        assertEquals(2, timeTest.getGolsSofridos());
+        assertEquals(1, timeTest.getSaldoGols());
+        System.out.println(timeTest.toString());
     }
 }
