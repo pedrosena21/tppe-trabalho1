@@ -6,7 +6,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 
-import com.campeonato.*;
+import com.campeonato.Partida;
+import com.campeonato.Rodada;
+import com.campeonato.Time;
+import com.campeonato.exception.PartidaJaExisteNaRodadaException;
+import com.campeonato.exception.RodadaLotadaException;
 
 class RodadaTest {
 	private Rodada rodadaTeste;
@@ -22,7 +26,7 @@ class RodadaTest {
 	}
 	
 	@Test
-	void testInserirPartida() {
+	void testInserirPartida() throws RodadaLotadaException, PartidaJaExisteNaRodadaException {
 		Partida jogo1 = new Partida(time1, time2, LocalDateTime.now());
 		
 		rodadaTeste.inserirPartida(jogo1);
@@ -45,7 +49,15 @@ class RodadaTest {
 	}
 	
 	@Test
-	void testToString() {
+	void testToString() throws RodadaLotadaException, PartidaJaExisteNaRodadaException {
+		assertEquals("Rodada 1(0 jogos)", rodadaTeste.toString());
+		
+		rodadaTeste.inserirPartida(new Partida(time1, time2, LocalDateTime.now()));
+		assertEquals("Rodada 1(1 jogos)", rodadaTeste.toString());
+	}
+
+	@Test
+	void construcaoRodada() throws RodadaLotadaException, PartidaJaExisteNaRodadaException {
 		assertEquals("Rodada 1(0 jogos)", rodadaTeste.toString());
 		
 		rodadaTeste.inserirPartida(new Partida(time1, time2, LocalDateTime.now()));

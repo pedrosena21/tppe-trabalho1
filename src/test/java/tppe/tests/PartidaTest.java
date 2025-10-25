@@ -78,12 +78,12 @@ public class PartidaTest {
 
         @Test
         void pegarCartoesAmarelos() {
-            var jogador = new Jogador(partida.getTimeFora(), "Roberto", 11);
+            var jogador = new Jogador(partida.getTimeVisitante(), "Roberto", 11);
             partida.inserirCartaoAmarelo(jogador);
 
             ArrayList<Jogador> expectedResponse = new ArrayList<>(Arrays.asList(jogador));
 
-            assertEquals(expectedResponse, partida.getCartoesAmarelos(partida.getTimeFora()));
+            assertEquals(expectedResponse, partida.getCartoesAmarelos(partida.getTimeVisitante()));
             assertEquals(expectedResponse, partida.getCartoesAmarelos());
             assertEquals(new ArrayList<>(), partida.getCartoesVermelhos());
         }
@@ -122,22 +122,22 @@ public class PartidaTest {
             var jogador = partida.getTimeCasa().getJogador(11);
 
             var gol = new Gol(jogador,
-                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeFora());
+                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeVisitante());
 
-            partida.marcarGol(jogador, 13, 12, partida.getTimeFora());
+            partida.marcarGol(jogador, 13, 12, partida.getTimeVisitante());
 
             ArrayList<Gol> expectedResponse = new ArrayList<>(Arrays.asList(gol));
 
             assertEquals(expectedResponse, partida.getGols(partida.getTimeCasa()));
             assertEquals(expectedResponse, partida.getGols());
-            assertEquals(new ArrayList<>(), partida.getGols(partida.getTimeFora()));
+            assertEquals(new ArrayList<>(), partida.getGols(partida.getTimeVisitante()));
             assertFalse(partida.getGols().get(0).isGolContra());
         }
 
         @Test
         @DisplayName("Deve retornar jogadores que fizeram gols em fora de casa")
         void marcarGolFora() throws JogadorNaoEncontradorException {
-            var jogador = partida.getTimeFora().getJogador(3);
+            var jogador = partida.getTimeVisitante().getJogador(3);
 
             var gol = new Gol(jogador,
                     partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeCasa());
@@ -147,7 +147,7 @@ public class PartidaTest {
             ArrayList<Gol> expectedGolsFora = new ArrayList<>(Arrays.asList(gol));
             ArrayList<Gol> expectedGolsCasa = new ArrayList<>(Arrays.asList());
 
-            assertEquals(expectedGolsFora, partida.getGols(partida.getTimeFora()));
+            assertEquals(expectedGolsFora, partida.getGols(partida.getTimeVisitante()));
             assertEquals(expectedGolsCasa, partida.getGols(partida.getTimeCasa()));
             assertEquals(new ArrayList<>(), partida.getGols(partida.getTimeCasa()));
             assertFalse(partida.getGols().get(0).isGolContra());
@@ -156,17 +156,17 @@ public class PartidaTest {
         @Test
         @DisplayName("Deve retornar jogadores que fizeram gols contra")
         void marcarGolContra() throws JogadorNaoEncontradorException {
-            var jogador = partida.getTimeFora().getJogador(3);
+            var jogador = partida.getTimeVisitante().getJogador(3);
 
             var gol = new Gol(jogador,
-                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeFora());
+                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeVisitante());
 
-            partida.marcarGol(jogador, 13, 12, partida.getTimeFora());
+            partida.marcarGol(jogador, 13, 12, partida.getTimeVisitante());
 
             ArrayList<Gol> expectedResponse = new ArrayList<>(Arrays.asList(gol));
 
-            assertEquals(expectedResponse, partida.getGols(partida.getTimeFora()));
-            assertEquals(expectedResponse, partida.getGols(partida.getTimeFora()));
+            assertEquals(expectedResponse, partida.getGols(partida.getTimeVisitante()));
+            assertEquals(expectedResponse, partida.getGols(partida.getTimeVisitante()));
             assertTrue(partida.getGols().get(0).isGolContra());
         }
 
@@ -174,11 +174,11 @@ public class PartidaTest {
         @DisplayName("Deve retornar 4 gols para casa e 1 para fora")
         void marcarGols() throws JogadorNaoEncontradorException {
             var jogador1 = partida.getTimeCasa().getJogador(3);
-            var jogador2 = partida.getTimeFora().getJogador(1);
-            var jogador3 = partida.getTimeFora().getJogador(2);
+            var jogador2 = partida.getTimeVisitante().getJogador(1);
+            var jogador3 = partida.getTimeVisitante().getJogador(2);
 
             var gol1 = new Gol(jogador1,
-                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeFora());
+                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeVisitante());
             var gol2 = new Gol(jogador2,
                     partida.getInicioPartida().plusMinutes(14).plusSeconds(12), partida.getTimeCasa());
             var gol3 = new Gol(jogador2,
@@ -188,7 +188,7 @@ public class PartidaTest {
             var gol5 = new Gol(jogador3,
                     partida.getInicioPartida().plusMinutes(87).plusSeconds(12), partida.getTimeCasa());
 
-            partida.marcarGol(jogador1, 13, 12, partida.getTimeFora());
+            partida.marcarGol(jogador1, 13, 12, partida.getTimeVisitante());
             partida.marcarGol(jogador2, 14, 12, partida.getTimeCasa());
             partida.marcarGol(jogador2, 54, 11, partida.getTimeCasa());
             partida.marcarGol(jogador3, 67, 12, partida.getTimeCasa());
@@ -198,21 +198,21 @@ public class PartidaTest {
             ArrayList<Gol> expectedGolsTimeCasa = new ArrayList<>(Arrays.asList(gol1));
 
             assertEquals(expectedGolsTimeCasa, partida.getGols(partida.getTimeCasa()));
-            assertEquals(expectedGolsTimeFora, partida.getGols(partida.getTimeFora()));
+            assertEquals(expectedGolsTimeFora, partida.getGols(partida.getTimeVisitante()));
 
             assertEquals(1, partida.getQuantidadeGols(partida.getTimeCasa()));
-            assertEquals(4, partida.getQuantidadeGols(partida.getTimeFora()));
+            assertEquals(4, partida.getQuantidadeGols(partida.getTimeVisitante()));
         }
 
         @Test
         @DisplayName("Deve retornar 4 gols para casa e 1 para fora")
         void anulandoGols() throws JogadorNaoEncontradorException {
             var jogador1 = partida.getTimeCasa().getJogador(3);
-            var jogador2 = partida.getTimeFora().getJogador(1);
-            var jogador3 = partida.getTimeFora().getJogador(2);
+            var jogador2 = partida.getTimeVisitante().getJogador(1);
+            var jogador3 = partida.getTimeVisitante().getJogador(2);
 
             var gol1 = new Gol(jogador1,
-                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeFora());
+                    partida.getInicioPartida().plusMinutes(13).plusSeconds(12), partida.getTimeVisitante());
             var gol2 = new Gol(jogador2,
                     partida.getInicioPartida().plusMinutes(14).plusSeconds(12), partida.getTimeCasa());
             var gol3 = new Gol(jogador2,
@@ -222,7 +222,7 @@ public class PartidaTest {
             var gol5 = new Gol(jogador3,
                     partida.getInicioPartida().plusMinutes(87).plusSeconds(12), partida.getTimeCasa());
 
-            partida.marcarGol(jogador1, 13, 12, partida.getTimeFora());
+            partida.marcarGol(jogador1, 13, 12, partida.getTimeVisitante());
             partida.marcarGol(jogador2, 14, 12, partida.getTimeCasa());
             partida.marcarGol(jogador2, 54, 11, partida.getTimeCasa());
             partida.marcarGol(jogador3, 67, 12, partida.getTimeCasa());
@@ -234,10 +234,10 @@ public class PartidaTest {
             ArrayList<Gol> expectedGolsTimeCasa = new ArrayList<>(Arrays.asList(gol1));
 
             assertEquals(expectedGolsTimeCasa, partida.getGols(partida.getTimeCasa()));
-            assertEquals(expectedGolsTimeFora, partida.getGols(partida.getTimeFora()));
+            assertEquals(expectedGolsTimeFora, partida.getGols(partida.getTimeVisitante()));
 
             assertEquals(1, partida.getQuantidadeGols(partida.getTimeCasa()));
-            assertEquals(3, partida.getQuantidadeGols(partida.getTimeFora()));
+            assertEquals(3, partida.getQuantidadeGols(partida.getTimeVisitante()));
         }
     }
 }

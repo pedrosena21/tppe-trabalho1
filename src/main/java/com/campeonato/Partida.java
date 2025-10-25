@@ -7,21 +7,19 @@ import java.util.List;
 public class Partida {
     
     private Time timeCasa;
-    private Time timeFora;
+    private Time timeVisitante;
     private LocalDateTime inicioPartida;
     private String estadio;
 
     private List<Jogador> cartoesVermelhos;
     private List<Jogador> cartoesAmarelos;
     private List<Gol> gols;
-    private int placarTimeCasa = 0;
-    private int placarTimeFora = 0;
 
     public Partida(){};
 
     public Partida(Time timecasa, Time timefora, LocalDateTime inicioPartida) {
         this.timeCasa = timecasa;
-        this.timeFora = timefora;
+        this.timeVisitante = timefora;
         this.inicioPartida = inicioPartida;
         this.cartoesAmarelos = new ArrayList<>();
         this.cartoesVermelhos = new ArrayList<>();
@@ -41,8 +39,8 @@ public class Partida {
         return timeCasa;
     }
 
-    public Time getTimeFora() {
-        return timeFora;
+    public Time getTimeVisitante() {
+        return timeVisitante;
     }
 
     public LocalDateTime getInicioPartida() {
@@ -51,6 +49,14 @@ public class Partida {
     
     public List<Gol> getGols(Time fez) {
         return gols.stream().filter(g -> g.getFez() == fez).toList();
+    }
+
+    public int getGolsTimeCasa() {
+        return (int) gols.stream().filter(g -> g.getFez() == this.timeCasa).count();
+    }
+
+    public int getGolsTimeVisitante() {
+        return (int) gols.stream().filter(g -> g.getFez() == this.timeVisitante).count();
     }
 
     public List<Gol> getGols() {
@@ -81,6 +87,23 @@ public class Partida {
         return cartoesAmarelos.stream().filter(cartao -> cartao.getTime() == time).toList();
     }
 
+    public int getCartoesAmarelosTimeCasa() {
+        return (int) cartoesAmarelos.stream().filter(cartao -> cartao.getTime() == this.timeCasa).count();
+    }
+
+    public int getCartoesAmarelosTimeVisitante() {
+        return (int) cartoesAmarelos.stream().filter(cartao -> cartao.getTime() == this.timeVisitante).count();
+    }
+
+    public int getCartoesVermelhosTimeCasa() {
+        return (int) cartoesVermelhos.stream().filter(cartao -> cartao.getTime() == this.timeCasa).count();
+    }
+
+    public int getCartoesVermelhosTimeVisitante() {
+        return (int) cartoesVermelhos.stream().filter(cartao -> cartao.getTime() == this.timeVisitante).count();
+    }
+    
+
     public void anularGol(Gol gol) {
         gol.anularGol();
     }
@@ -108,5 +131,41 @@ public class Partida {
 
     public int getGolsAnulados() {
         return (int) gols.stream().filter(g -> (g.isAnulado())).count();
-    }   
+    }
+
+    public int getPontuacaoTime(Time time) throws TimeNaoPertenceAPartidaException {
+        if (this.timeCasa != time && this.timeVisitante != time) 
+            throw new TimeNaoPertenceAPartidaException();
+        
+        if (this.timeCasa == time) {
+            if (this.getQuantidadeGols(timeCasa) > this.getQuantidadeGols(this.timeVisitante))
+                return 3;
+            if (this.getQuantidadeGols(this.timeCasa) < this.getQuantidadeGols(this.timeVisitante))
+                return 0;
+        }
+        if (this.timeVisitante == time) {
+            if (this.getQuantidadeGols(timeCasa) > this.getQuantidadeGols(this.timeVisitante))
+                return 0;
+            if (this.getQuantidadeGols(this.timeCasa) < this.getQuantidadeGols(this.timeVisitante))
+                return 3;
+        }
+
+        return 1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != Partida.class)
+            return false;
+
+        Partida p = (Partida) obj;
+
+        if (this.getTimeCasa() == p.getTimeCasa() && this.getTimeVisitante() == p.getTimeVisitante()) {
+            return true;
+        }
+
+        return false;
+    }
+
+
 }
