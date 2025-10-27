@@ -93,6 +93,9 @@ public class CampeonatoTest {
 	void testCalcularPontuacaoTimeSemPartidasRetornaZero() throws CampeonatoLotadoException {
 		var timeA = campeonato.getTimes().get(0);
 
+		// Atualiza estatísticas através do campeonato
+		campeonato.atualizarEstatisticasTime(timeA);
+
 		short pontuacao = campeonato.calcularPontuacaoTime(timeA);
 
 		assertEquals(0, pontuacao, "Pontuação deve ser zero sem partidas");
@@ -109,7 +112,11 @@ public class CampeonatoTest {
 		campeonato.adicionarRodada(rodada);
 		
 		var jogador1 = new Jogador(timeA, "Carlos", 11);
-		partida.marcarGol(jogador1, 0, 0, timeA);
+		partida.marcarGol(jogador1, 0, 0, timeB);
+
+		// Atualiza estatísticas através do campeonato após os gols
+		campeonato.atualizarEstatisticasTime(timeA);
+		campeonato.atualizarEstatisticasTime(timeB);
 
 		short pontuacaoTimeA = campeonato.calcularPontuacaoTime(timeA);
 		short pontuacaoTimeB = campeonato.calcularPontuacaoTime(timeB);
@@ -128,6 +135,10 @@ public class CampeonatoTest {
 		rodada.inserirPartida(partida);
 		campeonato.adicionarRodada(rodada);
 
+		// Atualiza estatísticas através do campeonato (empate 0x0)
+		campeonato.atualizarEstatisticasTime(timeA);
+		campeonato.atualizarEstatisticasTime(timeB);
+
 		short pontuacaoTimeA = campeonato.calcularPontuacaoTime(timeA);
 		short pontuacaoTimeB = campeonato.calcularPontuacaoTime(timeB);
 
@@ -136,7 +147,7 @@ public class CampeonatoTest {
 	}
 
 	@Test
-	void testCalcularPontuacaoTimeMultiplasPartidasSomaPontosCorretamente() throws CampeonatoLotadoException {
+	void testCalcularPontuacaoTimeMultiplasPartidasSomaPontosCorretamente() throws CampeonatoLotadoException, JogadorNaoEncontradorException {
 		var timeA = campeonato.getTimes().get(0);
 		var timeB = campeonato.getTimes().get(1);
 		var timeC = campeonato.getTimes().get(2);
@@ -147,11 +158,18 @@ public class CampeonatoTest {
 		Partida partida1 = new Partida(timeA, timeB, LocalDateTime.now());
 		Partida partida2 = new Partida(timeA, timeC, LocalDateTime.now());
 
+		// Time A vence partida1
+		var jogador1 = new Jogador(timeA, "Carlos", 11);
+		partida1.marcarGol(jogador1, 0, 0, timeB);
+
 		rodada1.inserirPartida(partida1);
 		rodada2.inserirPartida(partida2);
 
 		campeonato.adicionarRodada(rodada1);
 		campeonato.adicionarRodada(rodada2);
+
+		// Atualiza estatísticas através do campeonato
+		campeonato.atualizarEstatisticasTime(timeA);
 
 		short pontuacaoTimeA = campeonato.calcularPontuacaoTime(timeA);
 
@@ -160,21 +178,32 @@ public class CampeonatoTest {
 
 	@Test
 	void testCalcularClassificacaoComTimesSemPontosOrdenaPorNome() throws CampeonatoLotadoException {
-		var athleticoParanaense = campeonato.getTimes().get(11);
-		var atleticoGoianiense = campeonato.getTimes().get(18);
-		var atleticoMineiro = campeonato.getTimes().get(2);
+		// Atualiza estatísticas de todos os times
+		for (Time time : campeonato.getTimes()) {
+			campeonato.atualizarEstatisticasTime(time);
+		}
 
 		campeonato.calcularClassificacao();
 
 		List<Time> times = campeonato.getTimes();
 
-		assertEquals(athleticoParanaense, times.get(0), "Primeiro deve ser Flamengo (ordem alfabética)");
-		assertEquals(atleticoGoianiense, times.get(1), "Segundo deve ser Palmeiras (ordem alfabética)");
-		assertEquals(atleticoMineiro, times.get(2), "Terceiro deve ser Vasco (ordem alfabética)");
+		var athleticoParanaense = campeonato.getTimes().stream()
+			.filter(t -> t.getNome().equals("Athletico-PR"))
+			.findFirst().orElse(null);
+		var atleticoGoianiense = campeonato.getTimes().stream()
+			.filter(t -> t.getNome().equals("Atlético-GO"))
+			.findFirst().orElse(null);
+		var atleticoMineiro = campeonato.getTimes().stream()
+			.filter(t -> t.getNome().equals("Atlético-MG"))
+			.findFirst().orElse(null);
+
+		assertEquals(athleticoParanaense, times.get(0), "Primeiro deve ser Athletico-PR (ordem alfabética)");
+		assertEquals(atleticoGoianiense, times.get(1), "Segundo deve ser Atlético-GO (ordem alfabética)");
+		assertEquals(atleticoMineiro, times.get(2), "Terceiro deve ser Atlético-MG (ordem alfabética)");
 	}
 
 	@Test
-	void testCalcularClassificacaoOrdenaPorPontosDecrescente() throws CampeonatoLotadoException {
+	void testCalcularClassificacaoOrdenaPorPontosDecrescente() throws CampeonatoLotadoException, JogadorNaoEncontradorException {
 		var timeA = campeonato.getTimes().get(0);
 		var timeB = campeonato.getTimes().get(1);
 		var timeC = campeonato.getTimes().get(2);
@@ -183,13 +212,19 @@ public class CampeonatoTest {
 		Partida partida1 = new Partida(timeA, timeB, LocalDateTime.of(2025, 11, 6, 16, 15));
 		Partida partida2 = new Partida(timeA, timeC, LocalDateTime.of(2025, 11, 7, 16, 15));
 
-		rodada.inserirPartida(partida1);
-		rodada.inserirPartida(partida2);
-		
+		// Time B vence Time A
 		var jogador1 = new Jogador(timeB, "Carlos", 11);
 		partida1.marcarGol(jogador1, 0, 0, timeA);
 
+		rodada.inserirPartida(partida1);
+		rodada.inserirPartida(partida2);
+
 		campeonato.adicionarRodada(rodada);
+
+		// Atualiza estatísticas de todos os times
+		campeonato.atualizarEstatisticasTime(timeA);
+		campeonato.atualizarEstatisticasTime(timeB);
+		campeonato.atualizarEstatisticasTime(timeC);
 
 		campeonato.calcularClassificacao();
 		List<Time> times = campeonato.getTimes();
@@ -200,11 +235,10 @@ public class CampeonatoTest {
 	}
 
 	@Test
-	void testCalcularClassificacaoComEmpateEmPontosOrdenaPorSaldoGols() throws CampeonatoLotadoException {
+	void testCalcularClassificacaoComEmpateEmPontosOrdenaPorSaldoGols() throws CampeonatoLotadoException, JogadorNaoEncontradorException {
 		var flamengo = campeonato.getTimes().get(0);
 		var gremio = campeonato.getTimes().get(3);
 
-		
 		Partida partida = new Partida(flamengo, gremio, LocalDateTime.now());
 		var jogador1 = new Jogador(flamengo, "Carlos", 11);
 		partida.marcarGol(jogador1, 15, 0, gremio);
@@ -214,19 +248,23 @@ public class CampeonatoTest {
 
 		campeonato.adicionarRodada(rodada);
 
+		// Atualiza estatísticas através do campeonato
+		campeonato.atualizarEstatisticasTime(flamengo);
+		campeonato.atualizarEstatisticasTime(gremio);
+
 		campeonato.calcularClassificacao();
 
 		List<Time> times = campeonato.getTimes();
 
 		assertEquals(flamengo, times.get(0), "Flamengo deve estar em primeiro com melhor saldo");
-		assertEquals(gremio, times.get(1), "Gregio deve estar em segundo com pior saldo");
+		assertEquals(gremio, times.get(1), "Grêmio deve estar em segundo com pior saldo");
 	}
 
 	@Test
 	void testConstrutorComParametrosInicializaListasCorretamente() {
 		List<Time> times = new ArrayList<>();
-		times.add(timeA);
-		times.add(timeB);
+		times.add(new Time("Time A", "Estádio A"));
+		times.add(new Time("Time B", "Estádio B"));
 
 		List<Rodada> rodadas = new ArrayList<>();
 		Rodada rodada = new Rodada(1);
@@ -236,8 +274,8 @@ public class CampeonatoTest {
 
 		assertEquals(2, campeonatoComParametros.getTimes().size(), "Deve conter 2 times");
 		assertEquals(1, campeonatoComParametros.getRodadas().size(), "Deve conter 1 rodada");
-		assertTrue(campeonatoComParametros.getTimes().contains(timeA), "Deve conter Time A");
-		assertTrue(campeonatoComParametros.getTimes().contains(timeB), "Deve conter Time B");
+		assertEquals("Time A", campeonatoComParametros.getTimes().get(0).getNome(), "Deve conter Time A");
+		assertEquals("Time B", campeonatoComParametros.getTimes().get(1).getNome(), "Deve conter Time B");
 	}
 
 	@Test
@@ -269,9 +307,13 @@ public class CampeonatoTest {
 
 	@Test
     void testCalcularClassificacaoComRodadaVaziaNaoLancaExcecao() throws CampeonatoLotadoException {
-        
         Rodada rodadaVazia = new Rodada(99);
         campeonato.adicionarRodada(rodadaVazia);
+
+        // Atualiza estatísticas antes de calcular classificação
+        for (Time time : campeonato.getTimes()) {
+            campeonato.atualizarEstatisticasTime(time);
+        }
 
         assertDoesNotThrow(() -> campeonato.calcularClassificacao(),
                 "Não deve lançar exceção com rodada vazia");
@@ -311,4 +353,70 @@ public class CampeonatoTest {
         assertEquals(primeiroConfronto.getTime2(), partidaVolta.getTimeCasa(), "No código, o segundo jogo é T2 vs T1.");
         assertEquals(primeiroConfronto.getTime1(), partidaVolta.getTimeVisitante(), "No código, o segundo jogo é T2 vs T1.");
     }
+
+	@Test
+	void testAtualizarEstatisticasTimeVitoria() throws CampeonatoLotadoException, JogadorNaoEncontradorException {
+		var timeA = campeonato.getTimes().get(0);
+		var timeB = campeonato.getTimes().get(1);
+
+		Rodada rodada = new Rodada(1);
+		Partida partida = new Partida(timeA, timeB, LocalDateTime.now());
+		
+		// TimeA faz 2 gols, TimeB não faz gol
+		var jogador1 = new Jogador(timeA, "Carlos", 11);
+		var jogador2 = new Jogador(timeA, "Pedro", 9);
+		partida.marcarGol(jogador1, 10, 0, timeB);
+		partida.marcarGol(jogador2, 25, 0, timeB);
+
+		rodada.inserirPartida(partida);
+		campeonato.adicionarRodada(rodada);
+
+		campeonato.atualizarEstatisticasTime(timeA);
+		campeonato.atualizarEstatisticasTime(timeB);
+
+		assertEquals(3, timeA.getPontos(), "Time A deve ter 3 pontos");
+		assertEquals(1, timeA.getVitorias(), "Time A deve ter 1 vitória");
+		assertEquals(2, timeA.getGolsMarcados(), "Time A deve ter 2 gols marcados");
+		assertEquals(0, timeA.getGolsSofridos(), "Time A não deve ter gols sofridos");
+		assertEquals(2, timeA.getSaldoGols(), "Time A deve ter saldo de 2 gols");
+
+		assertEquals(0, timeB.getPontos(), "Time B não deve ter pontos");
+		assertEquals(1, timeB.getDerrotas(), "Time B deve ter 1 derrota");
+		assertEquals(0, timeB.getGolsMarcados(), "Time B não deve ter gols marcados");
+		assertEquals(2, timeB.getGolsSofridos(), "Time B deve ter 2 gols sofridos");
+		assertEquals(-2, timeB.getSaldoGols(), "Time B deve ter saldo de -2 gols");
+	}
+
+	@Test
+	void testAtualizarEstatisticasTimeEmpate() throws CampeonatoLotadoException, JogadorNaoEncontradorException {
+		var timeA = campeonato.getTimes().get(0);
+		var timeB = campeonato.getTimes().get(1);
+
+		Rodada rodada = new Rodada(1);
+		Partida partida = new Partida(timeA, timeB, LocalDateTime.now());
+		
+		// Empate 1x1
+		var jogador1 = new Jogador(timeA, "Carlos", 11);
+		var jogador2 = new Jogador(timeB, "Roberto", 10);
+		partida.marcarGol(jogador1, 10, 0, timeB);
+		partida.marcarGol(jogador2, 30, 0, timeA);
+
+		rodada.inserirPartida(partida);
+		campeonato.adicionarRodada(rodada);
+
+		campeonato.atualizarEstatisticasTime(timeA);
+		campeonato.atualizarEstatisticasTime(timeB);
+
+		assertEquals(1, timeA.getPontos(), "Time A deve ter 1 ponto");
+		assertEquals(1, timeA.getEmpates(), "Time A deve ter 1 empate");
+		assertEquals(1, timeA.getGolsMarcados(), "Time A deve ter 1 gol marcado");
+		assertEquals(1, timeA.getGolsSofridos(), "Time A deve ter 1 gol sofrido");
+		assertEquals(0, timeA.getSaldoGols(), "Time A deve ter saldo 0");
+
+		assertEquals(1, timeB.getPontos(), "Time B deve ter 1 ponto");
+		assertEquals(1, timeB.getEmpates(), "Time B deve ter 1 empate");
+		assertEquals(1, timeB.getGolsMarcados(), "Time B deve ter 1 gol marcado");
+		assertEquals(1, timeB.getGolsSofridos(), "Time B deve ter 1 gol sofrido");
+		assertEquals(0, timeB.getSaldoGols(), "Time B deve ter saldo 0");
+	}
 }
