@@ -102,7 +102,22 @@ public class Partida {
     public int getCartoesVermelhosTimeVisitante() {
         return (int) cartoesVermelhos.stream().filter(cartao -> cartao.getTime() == this.timeVisitante).count();
     }
-    
+
+    public void finalizarPartida() {
+        timeCasa.atualizarEstatisticas(
+            this.getGolsTimeCasa(), 
+            this.getGolsTimeVisitante(), 
+            this.getCartoesAmarelosTimeCasa(), 
+            this.getCartoesVermelhosTimeCasa()
+        );
+
+        timeVisitante.atualizarEstatisticas(
+            this.getGolsTimeVisitante(), 
+            this.getGolsTimeCasa(), 
+            this.getCartoesAmarelosTimeVisitante(), 
+            this.getCartoesVermelhosTimeVisitante()
+        );
+    }
 
     public void anularGol(Gol gol) {
         gol.anularGol();

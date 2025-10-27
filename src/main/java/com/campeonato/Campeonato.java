@@ -116,9 +116,6 @@ public class Campeonato {
 	}
 
 	public void calcularClassificacao() {
-		for (Time time : times) { // TODO PRECISA AJUSTAR
-			atualizarEstatisticasTime(time);
-		}
 		Collections.sort(times, new Comparator<Time>() {
 			@Override
 			public int compare(Time t1, Time t2) {
@@ -145,48 +142,6 @@ public class Campeonato {
 		for (int i = 0; i < times.size(); i++) {
 			Time time = times.get(i);
 			System.out.printf("%2d. %s%n", i + 1, time.toString());
-		}
-	}
-
-	private void atualizarEstatisticasTime(Time time) {
-		int vitorias = 0;
-		int empates = 0;
-		int derrotas = 0;
-		int golsMarcados = 0;
-		int golsSofridos = 0;
-		int cartoesAmarelos = 0;
-		int cartoesVermelhos = 0;
-
-		for (Rodada rodada : rodadas) {
-			for (Partida partida : rodada.getPartidas()) {
-				if (partida.getTimeCasa().equals(time)) {
-					golsMarcados += partida.getQuantidadeGols(partida.getTimeCasa());
-					golsSofridos += partida.getQuantidadeGols(partida.getTimeVisitante());
-					cartoesAmarelos += partida.getCartoesAmarelosTimeCasa();
-					cartoesVermelhos += partida.getCartoesVermelhosTimeCasa();
-
-					if (partida.getGolsTimeCasa() > partida.getGolsTimeVisitante()) {
-						vitorias++;
-					} else if (partida.getGolsTimeCasa() == partida.getGolsTimeVisitante()) {
-						empates++;
-					} else {
-						derrotas++;
-					}
-				} else if (partida.getTimeVisitante().equals(time)) {
-					golsMarcados += partida.getGolsTimeVisitante();
-					golsSofridos += partida.getGolsTimeCasa();
-					cartoesAmarelos += partida.getCartoesAmarelosTimeVisitante();
-					cartoesVermelhos += partida.getCartoesVermelhosTimeVisitante();
-
-					if (partida.getGolsTimeVisitante() > partida.getGolsTimeCasa()) {
-						vitorias++;
-					} else if (partida.getGolsTimeVisitante() == partida.getGolsTimeCasa()) {
-						empates++;
-					} else {
-						derrotas++;
-					}
-				}
-			}
 		}
 	}
 
