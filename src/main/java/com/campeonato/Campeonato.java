@@ -79,40 +79,7 @@ public class Campeonato {
 	}
 
 	public short calcularPontuacaoTime(Time time) {
-		short pontuacao = 0;
-		int golsTime = 0;
-		int golsAdversario = 0;
-
-		for (Rodada rodada : rodadas) {
-			for (Partida partida : rodada.getPartidas()) {
-
-				if (partida.getTimeCasa().equals(time)) {
-					golsTime = partida.getQuantidadeGols(partida.getTimeCasa());
-					golsAdversario = partida.getQuantidadeGols(partida.getTimeVisitante());
-
-					pontuacao += calcularPontuacaoPartida(pontuacao, golsTime, golsAdversario);
-
-				}
-
-				if (partida.getTimeVisitante().equals(time)) {
-					golsTime = partida.getQuantidadeGols(partida.getTimeVisitante());
-					golsAdversario = partida.getQuantidadeGols(partida.getTimeCasa());
-
-					pontuacao += calcularPontuacaoPartida(pontuacao, golsTime, golsAdversario);
-				}
-			}
-		}
-
-		return pontuacao;
-	}
-
-	private short calcularPontuacaoPartida(short pontuacao, int golsTime, int golsAdversario) {
-		if (golsTime > golsAdversario) {
-			pontuacao += 3;
-		} else if (golsTime == golsAdversario) {
-			pontuacao += 1;
-		}
-		return pontuacao;
+		return new CalculadoraPontuacaoTime(this, time).calcular();
 	}
 
 	public void calcularClassificacao() {
