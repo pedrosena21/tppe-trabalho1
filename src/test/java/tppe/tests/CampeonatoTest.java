@@ -49,7 +49,7 @@ public class CampeonatoTest {
             new Time("Juventude", "Alfredo Jaconi"),
             new Time("Bragantino", "Nabi Abi Chedid"),
             new Time("Atlético-GO", "Antônio Accioly"),
-            new Time("Criciúma", "Heriberto Hülse")
+            new Time("Santos", "Vila Belmiro")
         );
         
         // Garante que temos 20 times para o teste
