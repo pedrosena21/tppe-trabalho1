@@ -9,19 +9,14 @@ public class Time {
     private List<Jogador> jogadores;
     private String estadio;
     private String nome;
-    private int pontos;
+    private EstatisticasTime estatisticas;
 
-    private int vitorias;
-    private int empates;
-    private int derrotas;
-    
-    private int golsMarcados;
-    private int golsSofridos;
-    private int saldoGols;
-
-    private int cartoesAmarelos;
-    private int cartoesVermelhos;
-
+    public Time(String nome, String estadio) {
+        this.nome = nome;
+        this.estadio = estadio;
+        this.jogadores = new ArrayList<>();
+        this.estatisticas = new EstatisticasTime();
+    }
 
     public Jogador getJogador(int camisa) throws JogadorNaoEncontradorException {
         for (var jogador : jogadores) {
@@ -29,7 +24,6 @@ public class Time {
                 return jogador;
             }
         }
-
         throw new JogadorNaoEncontradorException();
     }
     
@@ -47,113 +41,91 @@ public class Time {
         jogador.setTime(null);
     }
 
-
     public void setEstadio(String estadio) {
         this.estadio = estadio;
-    }
-
-
-    public Time(String nome, String estadio) {
-        this.nome = nome;
-        this.estadio = estadio;
-        this.pontos = 0;
-        this.vitorias = 0;
-        this.empates = 0;
-        this.derrotas = 0;
-        this.golsMarcados = 0;
-        this.golsSofridos = 0;
-        this.saldoGols = 0;
-        this.cartoesAmarelos = 0;
-        this.cartoesVermelhos = 0;
-        this.jogadores = new ArrayList<>();
-    }
-
-    public void atualizarEstatisticas(int golsMarcados, int golsSofridos, int cartoesAmarelos, int cartoesVermelhos) {
-        this.golsMarcados += golsMarcados;
-        this.golsSofridos += golsSofridos;
-        this.saldoGols += this.golsMarcados - this.golsSofridos;
-        this.cartoesAmarelos += cartoesAmarelos;
-        this.cartoesVermelhos += cartoesVermelhos;
-
-        if (golsMarcados > golsSofridos) {
-            this.vitorias += 1;
-            this.pontos += 3;
-        } else if (golsMarcados == golsSofridos) {
-            this.empates += 1;
-            this.pontos += 1;
-        } else {
-            this.derrotas += 1;
-        }
     }
 
     public String getNome() {
         return nome;
     }
+
     public String getEstadio() {
         return estadio;
     }
-    public int getPontos() {
-        return pontos;
+
+    // Métodos delegados para EstatisticasTime
+    public void atualizarEstatisticas(int golsMarcados, int golsSofridos, 
+                                     int cartoesAmarelos, int cartoesVermelhos) {
+        this.estatisticas.atualizarEstatisticas(golsMarcados, golsSofridos, 
+                                               cartoesAmarelos, cartoesVermelhos);
     }
+
+    public int getPontos() {
+        return estatisticas.getPontos();
+    }
+
     public int getVitorias() {
-        return vitorias;
+        return estatisticas.getVitorias();
     }
 
     public int getEmpates() {
-        return empates;
+        return estatisticas.getEmpates();
     }
 
     public int getDerrotas() {
-        return derrotas;
+        return estatisticas.getDerrotas();
     }
 
     public int getGolsMarcados() {
-        return golsMarcados;
+        return estatisticas.getGolsMarcados();
     }
 
     public int getGolsSofridos() {
-        return golsSofridos;
+        return estatisticas.getGolsSofridos();
     }
 
     public int getSaldoGols() {
-        return this.golsMarcados - this.golsSofridos;
+        return estatisticas.getSaldoGols();
     }
 
     public int getCartoesAmarelos() {
-        return cartoesAmarelos;
+        return estatisticas.getCartoesAmarelos();
     }
 
     public int getCartoesVermelhos() {
-        return cartoesVermelhos;
+        return estatisticas.getCartoesVermelhos();
+    }
+
+    public void adicionarCartaoVermelho() {
+        estatisticas.adicionarCartaoVermelho();
+    }
+
+    public void adicionarCartaoAmarelo() {
+        estatisticas.adicionarCartaoAmarelo();
+    }
+
+    public void adicionarGolMarcado() {
+        estatisticas.adicionarGolMarcado();
+    }
+
+    public void adicionarGolSofrido() {
+        estatisticas.adicionarGolSofrido();
+    }
+
+    public void anularGolMarcado() {
+        estatisticas.anularGolMarcado();
+    }
+
+    public void anularGolSofrido() {
+        estatisticas.anularGolSofrido();
+    }
+
+    public EstatisticasTime getEstatisticas() {
+        return estatisticas;
     }
 
     @Override
     public String toString() {
-        return String.format("%-20s - Pts: %2d | V: %2d | E: %2d | D: %2d | GM: %3d | GS: %3d | SG: %3d | CA: %2d | CV: %2d",
-                nome, pontos, vitorias, empates, derrotas, golsMarcados, golsSofridos, saldoGols, cartoesAmarelos, cartoesVermelhos);
-    }
-
-    public void adicionarCartaoVermelho() {
-        this.cartoesVermelhos++;
-    }
-
-    public void adicionarCartaoAmarelo() {
-        this.cartoesAmarelos++;
-    }
-
-    public void adicionarGolMarcado() {
-        this.golsMarcados++;
-    }
-
-    public void adicionarGolSofrido() {
-        this.golsSofridos++;
-    }
-
-    public void anularGolMarcado() {
-        this.golsMarcados--;
-    }
-
-    public void anularGolSofrido() {
-        this.golsSofridos--;
+        return String.format("%-20s - %s", nome, estatisticas.toString());
     }
 }
